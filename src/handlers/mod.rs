@@ -1,0 +1,10 @@
+pub mod auth;
+pub mod intern;
+pub mod task;
+pub mod logbook;
+pub mod evaluation;
+pub mod dashboard;
+pub mod report;
+pub mod user;
+pub mod profile;
+pub mod attendance;
