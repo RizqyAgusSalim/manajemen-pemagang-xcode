@@ -1,5 +1,5 @@
 # Tahap 1: Build aplikasi
-FROM rust:1.80 as builder
+FROM rust:latest as builder
 WORKDIR /usr/src/app
 COPY . .
 RUN cargo build --release
