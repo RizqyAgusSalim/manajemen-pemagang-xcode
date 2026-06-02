@@ -19,18 +19,30 @@ pub async fn register(
 ) -> Result<(StatusCode, Json<AuthResponse>), AppError> {
     tracing::info!("📝 register called for email={}", payload.email);
 
+    // ✅ Validasi input
+    if payload.password.len() < 8 {
+        return Err(AppError::BadRequest("Password harus minimal 8 karakter".into()));
+    }
+    if !payload.email.contains('@') || !payload.email.contains('.') {
+        return Err(AppError::BadRequest("Format email tidak valid".into()));
+    }
+    if payload.full_name.trim().is_empty() {
+        return Err(AppError::BadRequest("Nama lengkap tidak boleh kosong".into()));
+    }
+
     let hash = hash_password(&payload.password)?;
     let user_id = uuid::Uuid::new_v4().to_string();
     
     tracing::debug!("🆕 Creating user with id={}", user_id);
     
+    // 1️⃣ INSERT ke tabel users
     sqlx::query(
         "INSERT INTO users (id, email, password_hash, role, full_name) VALUES (?, ?, ?, ?, ?)"
     )
     .bind(&user_id)
     .bind(&payload.email)
     .bind(&hash)
-    .bind(&payload.role)
+    .bind("intern") // ✅ SECURITY: Hardcode role
     .bind(&payload.full_name)
     .execute(&state.pool)
     .await
@@ -39,6 +51,7 @@ pub async fn register(
         AppError::Database(e)
     })?;
 
+    // 2️⃣ FETCH user yang baru dibuat
     let row = sqlx::query(
         "SELECT id, email, role, full_name, created_at FROM users WHERE id = ?"
     )
@@ -57,7 +70,45 @@ pub async fn register(
         full_name: row.get("full_name"),
         created_at: row.get("created_at"),
     };
+
+    // 3️⃣ AUTO-CREATE INTERN RECORD (role = intern)
+    let intern_id = uuid::Uuid::new_v4().to_string();
     
+    let university = payload.university.clone().unwrap_or_default();
+    let major = payload.major.clone().unwrap_or_default();
+    let start_date = payload.start_date.filter(|s| !s.is_empty()).unwrap_or_else(|| {
+        chrono::Local::now().format("%Y-%m-%d").to_string()
+    });
+    let end_date = payload.end_date.filter(|s| !s.is_empty()).unwrap_or_else(|| {
+        (chrono::Local::now() + chrono::Duration::days(180)).format("%Y-%m-%d").to_string()
+    });
+    let nama_lengkap = payload.full_name.clone();
+    let nim = payload.email.split('@').next().unwrap_or("").to_string();
+    let division = payload.division.clone();
+
+    sqlx::query(
+        "INSERT INTO interns (id, user_id, university, major, start_date, end_date, status, nama_lengkap, nim, division) 
+         VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)"
+    )
+    .bind(&intern_id)
+    .bind(&user_id)
+    .bind(&university)
+    .bind(&major)
+    .bind(&start_date)
+    .bind(&end_date)
+    .bind(&nama_lengkap)
+    .bind(&nim)
+    .bind(&division)
+    .execute(&state.pool)
+    .await
+    .map_err(|e| {
+        tracing::error!("❌ Failed to create intern record: {:?}", e);
+        AppError::Database(e)
+    })?;
+    
+    tracing::info!("✅ Intern record created: id={}, user_id={}, division={:?}", intern_id, user_id, division);
+
+    // 4️⃣ Generate token & return response
     let token = generate_token(user.id.clone(), &user.role, &state.config.jwt_secret)?;
     
     tracing::info!("✅ User registered successfully: {}", user_id);
@@ -129,7 +180,11 @@ pub async fn forgot_password(
         return Ok(StatusCode::OK);
     }
 
-    let code = format!("{:06}", rand::thread_rng().gen_range(0..=999999));
+    // Gunakan 8 karakter alfanumerik untuk reset code yang lebih aman
+    let code: String = (0..8).map(|_| {
+        let idx = rand::thread_rng().gen_range(0..36);
+        if idx < 10 { (b'0' + idx) as char } else { (b'A' + idx - 10) as char }
+    }).collect();
     let reset_id = uuid::Uuid::new_v4().to_string();
 
     sqlx::query(
@@ -146,7 +201,7 @@ pub async fn forgot_password(
         AppError::Database(e)
     })?;
 
-    tracing::info!("📧 [SIMULASI EMAIL] Kode reset untuk {}: {}", req.email, code);
+    tracing::info!("📧 Kode reset telah dikirim untuk email={}", req.email);
 
     Ok(StatusCode::OK)
 }
@@ -178,6 +233,21 @@ pub async fn reset_password(
         return Err(AppError::Unauthorized);
     }
 
+    // ✅ SECURITY: Invalidate code before updating password
+    sqlx::query("DELETE FROM password_resets WHERE email = ?")
+        .bind(&req.email)
+        .execute(&state.pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("❌ Failed to delete used reset code: {:?}", e);
+            AppError::Database(e)
+        })?;
+
+    // ✅ SECURITY: Validasi kompleksitas password
+    if req.new_password.len() < 8 {
+        return Err(AppError::BadRequest("Password baru harus minimal 8 karakter".into()));
+    }
+
     let hash = hash_password(&req.new_password)?;
     sqlx::query("UPDATE users SET password_hash = ? WHERE email = ?")
         .bind(&hash)
@@ -186,15 +256,6 @@ pub async fn reset_password(
         .await
         .map_err(|e| {
             tracing::error!("❌ Failed to update password: {:?}", e);
-            AppError::Database(e)
-        })?;
-
-    sqlx::query("DELETE FROM password_resets WHERE email = ?")
-        .bind(&req.email)
-        .execute(&state.pool)
-        .await
-        .map_err(|e| {
-            tracing::error!("❌ Failed to delete used reset code: {:?}", e);
             AppError::Database(e)
         })?;
 

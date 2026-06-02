@@ -1,4 +1,4 @@
-use axum::{extract::State, Json, Extension, http::StatusCode};
+use axum::{extract::State, Json, Extension};
 use serde::Serialize;
 use crate::state::AppState;
 use crate::error::AppError;
@@ -180,13 +180,12 @@ pub async fn intern_stats(
             COUNT(DISTINCT CASE WHEN t.status = 'completed' THEN t.id END) as completed_tasks,
             COUNT(DISTINCT CASE WHEN l.status IN ('submitted', 'approved') THEN l.id END) as submitted_logbooks,
             COUNT(DISTINCT CASE WHEN l.status = 'approved' THEN l.id END) as approved_logbooks,
-            e.final_score as evaluation_score
+            (SELECT final_score FROM evaluations WHERE intern_id = i.id ORDER BY created_at DESC LIMIT 1) as evaluation_score
         FROM interns i
         LEFT JOIN tasks t ON t.intern_id = i.id
         LEFT JOIN logbooks l ON l.intern_id = i.id
-        LEFT JOIN evaluations e ON e.intern_id = i.id
         WHERE i.user_id = ?
-        GROUP BY i.id, e.final_score"#
+        GROUP BY i.id"#
     )
     .bind(&claims.sub)
     .fetch_optional(&state.pool)

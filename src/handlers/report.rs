@@ -104,7 +104,7 @@ pub async fn generate_intern_report(
     );
 
     let page = doc.get_page(page1);
-    let mut layer = page.get_layer(layer1);
+    let layer = page.get_layer(layer1);
 
     let font = doc.add_builtin_font(BuiltinFont::Helvetica).map_err(|e| {
         tracing::error!("❌ Failed to add font for PDF: {:?}", e);

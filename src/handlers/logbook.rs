@@ -7,6 +7,21 @@ use sqlx::Row;
 use chrono::{NaiveDate, DateTime, Utc};
 use uuid::Uuid;  // ✅ TAMBAH INI
 
+async fn resolve_intern_id(state: &AppState, user_id: &str) -> Result<String, AppError> {
+    sqlx::query_scalar::<_, String>("SELECT id FROM interns WHERE user_id = ?")
+        .bind(user_id)
+        .fetch_optional(&state.pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("❌ Failed to resolve intern_id for user_id={}: {:?}", user_id, e);
+            AppError::Database(e)
+        })?
+        .ok_or_else(|| {
+            tracing::warn!("⚠️ Intern record not found for user_id={}", user_id);
+            AppError::NotFound("Data pemagang tidak ditemukan".into())
+        })
+}
+
 // ==================== LIST LOGBOOKS ====================
 pub async fn list_logbooks(
     State(state): State<AppState>,
@@ -23,12 +38,13 @@ pub async fn list_logbooks(
         .fetch_all(&state.pool)
         .await
     } else {
-        tracing::debug!("📦 Fetching logbooks for intern_id={}", claims.sub);
+        let intern_id = resolve_intern_id(&state, &claims.sub).await?;
+        tracing::debug!("📦 Fetching logbooks for intern_id={}", intern_id);
         sqlx::query(
             "SELECT id, intern_id, date, activity, description, status, supervisor_notes, created_at 
              FROM logbooks WHERE intern_id = ? ORDER BY date DESC"
         )
-        .bind(&claims.sub)
+        .bind(&intern_id)
         .fetch_all(&state.pool)
         .await
     }
@@ -88,9 +104,12 @@ pub async fn get_logbook(
         created_at: row.get::<DateTime<Utc>, _>("created_at"),
     };
 
-    if claims.role == "intern" && logbook.intern_id != claims.sub {
-        tracing::warn!("⚠️ Unauthorized access to logbook {} by user {}", id, claims.sub);
-        return Err(AppError::Unauthorized);
+    if claims.role == "intern" {
+        let intern_id = resolve_intern_id(&state, &claims.sub).await?;
+        if logbook.intern_id != intern_id {
+            tracing::warn!("⚠️ Unauthorized access to logbook {} by user {}", id, claims.sub);
+            return Err(AppError::Unauthorized);
+        }
     }
 
     Ok(Json(logbook))
@@ -109,15 +128,28 @@ pub async fn create_logbook(
         return Err(AppError::Unauthorized);
     }
 
+    let intern_id = sqlx::query_scalar::<_, String>("SELECT id FROM interns WHERE user_id = ?")
+        .bind(&claims.sub)
+        .fetch_optional(&state.pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("❌ Failed to resolve intern_id for user_id={}: {:?}", claims.sub, e);
+            AppError::Database(e)
+        })?
+        .ok_or_else(|| {
+            tracing::warn!("⚠️ Intern record not found for user_id={}", claims.sub);
+            AppError::NotFound("Data pemagang tidak ditemukan".into())
+        })?;
+
     let new_id = Uuid::new_v4().to_string();
-    tracing::debug!("🆕 Creating logbook with id={}", new_id);
+    tracing::debug!("🆕 Creating logbook with id={} for intern_id={}", new_id, intern_id);
 
     sqlx::query(
         "INSERT INTO logbooks (id, intern_id, date, activity, description, status) 
          VALUES (?, ?, ?, ?, ?, 'draft')"
     )
     .bind(&new_id)
-    .bind(&claims.sub)
+    .bind(&intern_id)
     .bind(&payload.date)
     .bind(&payload.activity)
     .bind(&payload.description)
@@ -182,9 +214,22 @@ pub async fn update_logbook(
 
     let intern_id: String = check_row.get("intern_id");
 
-    if claims.role == "intern" && intern_id != claims.sub {
-        tracing::warn!("⚠️ Unauthorized update attempt for logbook {} by user {}", id, claims.sub);
-        return Err(AppError::Unauthorized);
+    if claims.role == "intern" {
+        let resolved_intern_id = resolve_intern_id(&state, &claims.sub).await?;
+        if intern_id != resolved_intern_id {
+            tracing::warn!("⚠️ Unauthorized update attempt for logbook {} by user {}", id, claims.sub);
+            return Err(AppError::Unauthorized);
+        }
+    }
+
+    // ✅ SECURITY: Tidak bisa update logbook yang sudah approved/rejected
+    let logbook_status: String = sqlx::query_scalar("SELECT status FROM logbooks WHERE id = ?")
+        .bind(&id)
+        .fetch_one(&state.pool)
+        .await
+        .map_err(|e| AppError::Database(e))?;
+    if logbook_status == "approved" || logbook_status == "rejected" {
+        return Err(AppError::BadRequest("Tidak bisa mengubah logbook yang sudah disetujui/ditolak".into()));
     }
 
     tracing::debug!("📦 Updating logbook {}", id);  // ✅ HAPUS payload dari debug (tidak implement Debug)

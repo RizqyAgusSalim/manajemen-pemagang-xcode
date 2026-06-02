@@ -8,3 +8,5 @@ pub mod report;
 pub mod user;
 pub mod profile;
 pub mod attendance;
+pub mod jadwal;
+pub mod project_proposal;

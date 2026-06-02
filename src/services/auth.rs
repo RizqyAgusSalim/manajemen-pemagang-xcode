@@ -1,9 +1,9 @@
 use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
-use jsonwebtoken::{encode, Header, EncodingKey};
+use jsonwebtoken::{encode, Header, EncodingKey, Algorithm};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub sub: String,  // Ubah ke String
     pub role: String,
@@ -30,7 +30,7 @@ pub fn generate_token(user_id: String, role: &str, secret: &str) -> Result<Strin
     let exp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
-        .as_secs() as usize + 86400;
+        .as_secs() as usize + 3600;
 
     let claims = Claims {
         sub: user_id,  // Tetap String
@@ -38,6 +38,6 @@ pub fn generate_token(user_id: String, role: &str, secret: &str) -> Result<Strin
         exp,
     };
 
-    encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.as_bytes()))
+    encode(&Header::new(Algorithm::HS256), &claims, &EncodingKey::from_secret(secret.as_bytes()))
         .map_err(|_| crate::error::AppError::Internal)
 }

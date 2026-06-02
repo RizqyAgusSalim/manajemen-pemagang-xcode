@@ -16,7 +16,6 @@ pub struct ErrorResponse {
 pub enum AppError {
     Database(sqlx::Error),
     Unauthorized,
-    TokenInvalid,
     Internal,
     BadRequest(String),
     NotFound(String),
@@ -28,22 +27,18 @@ impl IntoResponse for AppError {
         match &self {
             AppError::Database(e) => tracing::error!("💥 DATABASE ERROR: {:?}", e),
             AppError::Unauthorized => tracing::warn!("⚠️ UNAUTHORIZED: Access denied"),
-            AppError::TokenInvalid => tracing::warn!("⚠️ TOKEN INVALID: JWT verification failed"),
             AppError::Internal => tracing::error!("❌ INTERNAL ERROR: Generic internal error - check handler logs for specific context"),
             AppError::BadRequest(msg) => tracing::warn!("⚠️ BAD REQUEST: {}", msg),
             AppError::NotFound(msg) => tracing::warn!("⚠️ NOT FOUND: {}", msg),
         }
 
         let (status, error_msg, details) = match self {
-            AppError::Database(e) => {
-                let detail = format!("{:?}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string(), Some(detail))
+            AppError::Database(_e) => {
+                // Detail sudah di-log di atas (line 28), tidak dikirim ke client
+                (StatusCode::INTERNAL_SERVER_ERROR, "Database error".to_string(), None)
             },
             AppError::Unauthorized => {
                 (StatusCode::UNAUTHORIZED, "Unauthorized".to_string(), None)
-            },
-            AppError::TokenInvalid => {
-                (StatusCode::UNAUTHORIZED, "Token invalid or expired".to_string(), None)
             },
             AppError::Internal => {
                 (StatusCode::INTERNAL_SERVER_ERROR, "Terjadi kesalahan internal".to_string(), None)
