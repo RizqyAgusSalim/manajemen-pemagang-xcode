@@ -10,6 +10,9 @@
 --   Intern 29ce8078 (nama_lengkap='Rizqy Agus Salim')  → user_id 33c92461 (user full_name='Rizqy Agus Saliem')
 --   Intern 30e98192 (nama_lengkap='Muhammad Jawir')     → user_id aa10b59e (user full_name='Muhammad Jawir')
 
+-- Step 0: Disable foreign key checks temporarily
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- Step 1: Set temporary placeholder on intern Rizqy to avoid UNIQUE constraint violation
 UPDATE interns SET user_id = 'TEMP_PLACEHOLDER' WHERE id = '29ce8078-3ee7-11f1-b558-4ec2e12205b2';
 
@@ -18,3 +21,6 @@ UPDATE interns SET user_id = 'aa10b59e-946f-4514-8446-453f42e6007c' WHERE id = '
 
 -- Step 3: Assign Rizqy's user_id (33c92461) to Rizqy's intern record (29ce8078)
 UPDATE interns SET user_id = '33c92461-768b-4ec1-957f-5a7f325ef3c6' WHERE id = '29ce8078-3ee7-11f1-b558-4ec2e12205b2';
+
+-- Step 4: Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
