@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000" # Port web aplikasi Anda
+    environment:
+      - DATABASE_URL=mysql://intern_user:rahasia_db_1234@db:3306/intern_db
+      - JWT_SECRET=Ubah_Tulisan_Ini_Jadi_Password_Acak_Yg_Panjang_123!
+      - PORT=3000
+      - BIND_ADDRESS=0.0.0.0
+      - ALLOWED_ORIGIN=*
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=rahasia_root_1234
+      - MYSQL_DATABASE=intern_db
+      - MYSQL_USER=intern_user
+      - MYSQL_PASSWORD=rahasia_db_1234
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
