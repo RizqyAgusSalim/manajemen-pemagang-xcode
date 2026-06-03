@@ -5026,6 +5026,21 @@ async function deleteTask(taskId) {
     // --- MODALS AND API SUBMISSION FUNCTIONS ---
 
     function showAddAttendanceModal(internId) {
+      // Validasi Batas Waktu Presensi
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const currentTime = h * 60 + m; // Total menit
+
+      // Pagi: max 08:15 (495 menit), Siang: max 12:15 (735 menit)
+      if (h < 12 && currentTime > 495) {
+        alert("Maaf, batas waktu presensi untuk Shift Pagi (08:15 WIB) telah lewat. Presensi DITUTUP.");
+        return;
+      } else if (h >= 12 && currentTime > 735) {
+        alert("Maaf, batas waktu presensi untuk Shift Siang (12:15 WIB) telah lewat. Presensi DITUTUP.");
+        return;
+      }
+
       const modal = document.createElement('div');
       modal.id = 'attendance-modal';
       modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 fade-in';
