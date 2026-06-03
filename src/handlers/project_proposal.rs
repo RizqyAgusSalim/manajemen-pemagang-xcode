@@ -351,6 +351,12 @@ pub async fn review_project_proposal(
 
     let now = Utc::now();
 
+    let reviewer_id = if claims.sub == "superadmin_id" {
+        None
+    } else {
+        Some(claims.sub.clone())
+    };
+
     sqlx::query(
         "UPDATE project_proposals 
          SET status = ?, catatan_reviewer = ?, reviewed_by = ?, reviewed_at = ?, updated_at = ?
@@ -358,7 +364,7 @@ pub async fn review_project_proposal(
     )
     .bind(&payload.status)
     .bind(&payload.catatan_reviewer)
-    .bind(&claims.sub)
+    .bind(&reviewer_id)
     .bind(now)
     .bind(now)
     .bind(&proposal_id)

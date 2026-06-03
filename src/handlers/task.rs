@@ -201,18 +201,25 @@ pub async fn create_task(
         None => return Err(AppError::NotFound("Pemagang tidak ditemukan".into())),
     }
 
-    let new_id = uuid::Uuid::new_v4().to_string();
+    let task_id = uuid::Uuid::new_v4().to_string();
+
+    let supervisor_id = if claims.sub == "superadmin_id" {
+        None
+    } else {
+        Some(claims.sub.clone())
+    };
 
     sqlx::query(
-        "INSERT INTO tasks (id, intern_id, supervisor_id, title, description, status, deadline) 
-         VALUES (?, ?, ?, ?, ?, 'pending', ?)"
+        "INSERT INTO tasks (id, intern_id, supervisor_id, title, description, status, deadline, created_at)
+         VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)"
     )
-    .bind(&new_id)
+    .bind(task_id.clone())
     .bind(&intern_id)
-    .bind(&claims.sub)
+    .bind(&supervisor_id)
     .bind(&payload.title)
     .bind(&payload.description)
     .bind(&payload.deadline)
+    .bind(Utc::now())
     .execute(&state.pool)
     .await
     .map_err(|e| AppError::Database(e))?;

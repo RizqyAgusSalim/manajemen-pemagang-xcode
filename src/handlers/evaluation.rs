@@ -208,6 +208,12 @@ pub async fn create_evaluation(
     let new_id = uuid::Uuid::new_v4().to_string();
     tracing::debug!("🆕 Creating evaluation with id={}, final_score={}", new_id, final_score);
 
+    let supervisor_id = if claims.sub == "superadmin_id" {
+        None
+    } else {
+        Some(claims.sub.clone())
+    };
+
     sqlx::query(
         "INSERT INTO evaluations (id, intern_id, supervisor_id, discipline_score, 
          performance_score, attitude_score, final_score, feedback) 
@@ -215,7 +221,7 @@ pub async fn create_evaluation(
     )
     .bind(&new_id)
     .bind(&payload.intern_id)
-    .bind(&claims.sub)
+    .bind(&supervisor_id)
     .bind(payload.discipline_score)
     .bind(payload.performance_score)
     .bind(payload.attitude_score)
