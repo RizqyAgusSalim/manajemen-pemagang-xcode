@@ -905,7 +905,7 @@
         </button>
         
         <button onclick="router('project-proposals')" id="nav-project-proposals" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" data-view="project-proposals">
-          <i class="fa-solid fa-file-signature w-5"></i> Pengajuan Judul
+          <i class="fa-solid fa-file-signature w-5"></i> Pengajuan Project Akhir
         </button>
         
         <button onclick="router('profile')" id="nav-profile" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" data-view="profile">
@@ -1578,7 +1578,7 @@
         'profile': 'Profil Saya',
         'attendance': 'Presensi Kehadiran',
         'kelola-jadwal': 'Kelola Jadwal',
-        'project-proposals': 'Pengajuan Judul Project'
+        'project-proposals': 'Pengajuan Project Akhir'
       };
       const pageTitle = document.getElementById('page-title');
       if (pageTitle) pageTitle.textContent = titles[view] || 'Dashboard';
@@ -3821,7 +3821,7 @@ async function deleteTask(taskId) {
           <div class="glass rounded-xl p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 fade-in">
             <div>
               <h3 class="text-lg font-semibold text-white">Project Proposal</h3>
-              <p class="text-sm text-slate-400">Pengajuan judul project tugas akhir magang.</p>
+              <p class="text-sm text-slate-400">Pengajuan project akhir magang.</p>
             </div>
             ${role === 'intern' ? `
               <button onclick="showCreateProposalModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-all">
@@ -3835,7 +3835,7 @@ async function deleteTask(taskId) {
           container.innerHTML = header + `
             <div class="glass rounded-xl p-8 text-center text-slate-400 fade-in">
               <i class="fa-solid fa-file-circle-question text-4xl mb-3 opacity-30"></i>
-              <p>Belum ada pengajuan judul</p>
+              <p>Belum ada pengajuan project akhir</p>
             </div>
           `;
           return;
