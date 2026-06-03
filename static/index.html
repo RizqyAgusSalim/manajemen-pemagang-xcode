@@ -2148,12 +2148,12 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
         }
 
           const divisi = [
-            { nama: 'Cyber Security Consultant', icon: 'fa-shield-halved', color: 'red', deskripsi: 'Analisis keamanan sistem, penetration testing, dan konsultasi keamanan jaringan perusahaan.', narahubung: 'Bpk. Ahmad Fauzi', kontak: '0812-3456-7890', kuota: '3 orang' },
-            { nama: 'Programmer (Front End / Back End)', icon: 'fa-code', color: 'blue', deskripsi: 'Pengembangan aplikasi web, mobile, dan sistem informasi menggunakan teknologi terkini.', narahubung: 'Ibu Sari Dewi', kontak: '0813-4567-8901', kuota: '5 orang' },
-            { nama: 'Public Relation', icon: 'fa-bullhorn', color: 'purple', deskripsi: 'Manajemen komunikasi, media sosial, dan hubungan masyarakat perusahaan.', narahubung: 'Ibu Rina Marlina', kontak: '0814-5678-9012', kuota: '2 orang' },
-            { nama: 'Designer', icon: 'fa-palette', color: 'pink', deskripsi: 'Desain grafis, UI/UX, branding, dan konten visual untuk kebutuhan perusahaan.', narahubung: 'Bpk. Dimas Prasetyo', kontak: '0815-6789-0123', kuota: '3 orang' },
-            { nama: 'IT Network & Hardware', icon: 'fa-server', color: 'orange', deskripsi: 'Instalasi, konfigurasi, dan pemeliharaan infrastruktur jaringan dan perangkat keras.', narahubung: 'Bpk. Hendra Wijaya', kontak: '0816-7890-1234', kuota: '4 orang' },
-            { nama: 'Network Engineer', icon: 'fa-network-wired', color: 'green', deskripsi: 'Perancangan dan pengelolaan arsitektur jaringan enterprise dan data center.', narahubung: 'Bpk. Rizal Firmansyah', kontak: '0817-8901-2345', kuota: '3 orang' }
+            { nama: 'Cyber Security Consultant', icon: 'fa-shield-halved', color: 'red', deskripsi: 'Analisis keamanan sistem, penetration testing, dan konsultasi keamanan jaringan perusahaan.', narahubung: 'Admin XCode', kontak: '0858 0394 6032', email: 'admin@xcodetraining.com', kuota: '3 orang' },
+            { nama: 'Programmer (Front End / Back End)', icon: 'fa-code', color: 'blue', deskripsi: 'Pengembangan aplikasi web, mobile, dan sistem informasi menggunakan teknologi terkini.', narahubung: 'Admin XCode', kontak: '0858 0394 6032', email: 'admin@xcodetraining.com', kuota: '5 orang' },
+            { nama: 'Public Relation', icon: 'fa-bullhorn', color: 'purple', deskripsi: 'Manajemen komunikasi, media sosial, dan hubungan masyarakat perusahaan.', narahubung: 'Admin XCode', kontak: '0858 0394 6032', email: 'admin@xcodetraining.com', kuota: '2 orang' },
+            { nama: 'Designer', icon: 'fa-palette', color: 'pink', deskripsi: 'Desain grafis, UI/UX, branding, dan konten visual untuk kebutuhan perusahaan.', narahubung: 'Admin XCode', kontak: '0858 0394 6032', email: 'admin@xcodetraining.com', kuota: '3 orang' },
+            { nama: 'IT Network & Hardware', icon: 'fa-server', color: 'orange', deskripsi: 'Instalasi, konfigurasi, dan pemeliharaan infrastruktur jaringan dan perangkat keras.', narahubung: 'Admin XCode', kontak: '0858 0394 6032', email: 'admin@xcodetraining.com', kuota: '4 orang' },
+            { nama: 'Network Engineer', icon: 'fa-network-wired', color: 'green', deskripsi: 'Perancangan dan pengelolaan arsitektur jaringan enterprise dan data center.', narahubung: 'Admin XCode', kontak: '0858 0394 6032', email: 'admin@xcodetraining.com', kuota: '3 orang' }
           ];
 
           container.innerHTML = `
@@ -2221,6 +2221,13 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
                         <a href="https://wa.me/${d.kontak.replace(/[-\s]/g, '')}" target="_blank"
                           class="text-xs text-brand-600 hover:text-brand-700 transition-colors font-medium">
                           ${d.kontak}
+                        </a>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-envelope text-slate-400 text-xs w-3"></i>
+                        <a href="mailto:${d.email}"
+                          class="text-xs text-brand-600 hover:text-brand-700 transition-colors font-medium">
+                          ${d.email}
                         </a>
                       </div>
                       <div class="flex items-center justify-between mt-2">
