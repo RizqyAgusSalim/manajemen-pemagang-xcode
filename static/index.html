@@ -388,7 +388,7 @@
       <div class="mb-8">
         <div class="flex items-center gap-3 mb-2">
           <div class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded font-bold text-2xl shadow-md">
-            Portal<span class="text-white/90">Pemagang</span>
+            Portal<span class="text-white/90"> Pemagang</span>
           </div>
           <div class="w-12 h-12 bg-white/80 backdrop-blur-md border border-white rounded-full flex items-center justify-center shadow-md">
             <i class="fa-solid fa-graduation-cap text-red-600 text-xl"></i>
@@ -515,11 +515,11 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="sr-only">Tanggal Mulai</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1 ml-1 uppercase">Tanggal Mulai</label>
             <input type="date" id="portal-reg-start-date" class="w-full pl-4 pr-4 py-3 rounded-xl bg-white/50 backdrop-blur-sm border border-white/60 text-slate-800 focus:border-red-400 focus:bg-white focus:ring-2 focus:ring-red-100 outline-none transition-all shadow-inner">
           </div>
           <div>
-            <label class="sr-only">Tanggal Selesai</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1 ml-1 uppercase">Tanggal Selesai</label>
             <input type="date" id="portal-reg-end-date" class="w-full pl-4 pr-4 py-3 rounded-xl bg-white/50 backdrop-blur-sm border border-white/60 text-slate-800 focus:border-red-400 focus:bg-white focus:ring-2 focus:ring-red-100 outline-none transition-all shadow-inner">
           </div>
         </div>
@@ -897,7 +897,7 @@
         </button>
         
         <button onclick="router('attendance')" id="nav-attendance" class="nav-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" data-view="attendance">
-          <i class="fa-solid fa-calendar-check w-5"></i> Absen
+          <i class="fa-solid fa-calendar-check w-5"></i> Presensi Kehadiran
         </button>
         
         <button onclick="router('evaluations')" id="nav-evaluations" class="nav-item hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors" data-view="evaluations">
@@ -1576,7 +1576,7 @@
         'evaluations': 'Penilaian',
         'users': 'Manajemen User',
         'profile': 'Profil Saya',
-        'attendance': 'Absen',
+        'attendance': 'Presensi Kehadiran',
         'kelola-jadwal': 'Kelola Jadwal',
         'project-proposals': 'Pengajuan Judul Project'
       };
@@ -1972,7 +1972,7 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
             </div>
             ${jadwalPreview}
             <div class="glass rounded-xl p-6 fade-in">
-              <h3 class="text-lg font-semibold text-white mb-4">Grafik Pemagang </h3>
+              <h3 class="text-lg font-semibold text-white mb-4">Grafik Pemagang Aktif </h3>
               <div class="relative h-[250px] w-full flex justify-center">
                 <canvas id="dashboardChart"></canvas>
               </div>
@@ -2025,7 +2025,7 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
                 }
               });
             } catch(e) {
-              console.error("Gagal memuat grafik pemagang:", e);
+              console.error("Gagal memuat Grafik Pemagang Aktif:", e);
             }
           }
 
@@ -2052,7 +2052,7 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
               `).join('')}
             </div>
             <div class="glass rounded-xl p-6 fade-in">
-              <h3 class="text-lg font-semibold text-white mb-4">Grafik Pemagang (Berdasarkan Universitas)</h3>
+              <h3 class="text-lg font-semibold text-white mb-4">Grafik Pemagang Aktif (Berdasarkan Universitas)</h3>
               <div class="relative h-[250px] w-full flex justify-center">
                 <canvas id="dashboardChart"></canvas>
               </div>
@@ -2105,7 +2105,7 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
                 }
               });
             } catch(e) {
-              console.error("Gagal memuat grafik pemagang:", e);
+              console.error("Gagal memuat Grafik Pemagang Aktif:", e);
             }
           }
 
@@ -4714,7 +4714,7 @@ async function deleteTask(taskId) {
                       ` : attendances.map((a, idx) => {
                         const statusObj = getStatusLabelAndBadge(a.status);
                         
-                        // Validasi penguncian absensi untuk intern
+                        // Validasi penguncian Presensi Kehadiran untuk intern
                         const d = new Date();
                         const todayStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
                         const attendanceDateStr = a.date ? a.date.substring(0, 10) : '';
@@ -4871,7 +4871,7 @@ async function deleteTask(taskId) {
                                 </button>
                                 <button onclick="showAdminEditAttendanceModal('${a.id}')" 
                                   class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded transition-colors text-xs font-semibold shadow-sm inline-flex items-center gap-1"
-                                  title="Edit Absen">
+                                  title="Edit Presensi Kehadiran">
                                   <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
                               </td>
@@ -5005,7 +5005,7 @@ async function deleteTask(taskId) {
         console.error('❌ Attendance error:', err);
         container.innerHTML = `
           <div class="glass rounded-xl p-6 fade-in">
-            <p class="text-red-400">Gagal memuat data absen: ${err.message}</p>
+            <p class="text-red-400">Gagal memuat data Presensi Kehadiran: ${err.message}</p>
             <button onclick="router('attendance')" class="mt-3 text-brand-400 hover:text-brand-300 text-sm">
               🔁 Coba Lagi
             </button>
@@ -5104,7 +5104,7 @@ async function deleteTask(taskId) {
             })
           });
 
-          alert('✅ Absen berhasil disimpan!');
+          alert('✅ Presensi Kehadiran berhasil disimpan!');
           modal.remove();
           renderAttendance(document.getElementById('content-area'));
         } catch (err) {
@@ -5214,7 +5214,7 @@ async function deleteTask(taskId) {
               throw new Error(errorMsg);
             }
 
-            alert('✅ Absen berhasil diperbarui!');
+            alert('✅ Presensi Kehadiran berhasil diperbarui!');
             modal.remove();
             renderAttendance(document.getElementById('content-area'));
           } catch (err) {
@@ -5242,7 +5242,7 @@ async function deleteTask(taskId) {
         modal.innerHTML = `
           <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl text-slate-800 border border-slate-200">
             <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
-              <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-user-pen text-blue-600 mr-2"></i>Edit Absen Pemagang</h3>
+              <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-user-pen text-blue-600 mr-2"></i>Edit Presensi Kehadiran Pemagang</h3>
               <button onclick="document.getElementById('attendance-modal').remove()" class="text-slate-400 hover:text-slate-600 transition-colors">
                 <i class="fa-solid fa-xmark text-xl"></i>
               </button>
@@ -5335,7 +5335,7 @@ async function deleteTask(taskId) {
               throw new Error(errorMsg);
             }
 
-            alert('✅ Absen berhasil diperbarui!');
+            alert('✅ Presensi Kehadiran berhasil diperbarui!');
             modal.remove();
             renderAttendance(document.getElementById('content-area'));
           } catch (err) {
@@ -5352,7 +5352,7 @@ async function deleteTask(taskId) {
     }
 
     async function confirmAttendance(attendanceId, status) {
-      if (!confirm(`Yakin ingin ${status === 'approved' ? 'menyetujui' : 'menolak'} absen ini?`)) return;
+      if (!confirm(`Yakin ingin ${status === 'approved' ? 'menyetujui' : 'menolak'} Presensi Kehadiran ini?`)) return;
       try {
         const res = await fetch(`${API_BASE}/attendances/${attendanceId}/status`, {
           method: 'PUT',
@@ -5368,10 +5368,10 @@ async function deleteTask(taskId) {
           throw new Error(`Gagal: ${res.status} ${text}`);
         }
 
-        alert(`✅ Absen berhasil ${status === 'approved' ? 'disetujui' : 'ditolak'}!`);
+        alert(`✅ Presensi Kehadiran berhasil ${status === 'approved' ? 'disetujui' : 'ditolak'}!`);
         renderAttendance(document.getElementById('content-area'));
       } catch (err) { 
-        alert('❌ Gagal konfirmasi absen: ' + err.message); 
+        alert('❌ Gagal konfirmasi Presensi Kehadiran: ' + err.message); 
       }
     }
 
