@@ -228,7 +228,7 @@ pub async fn create_task(
         "SELECT id, intern_id, supervisor_id, title, description, status, deadline, submission_file, feedback, created_at 
          FROM tasks WHERE id = ?"
     )
-    .bind(&new_id)
+    .bind(&task_id)
     .fetch_one(&state.pool)
     .await
     .map_err(|e| AppError::Database(e))?;
