@@ -1922,7 +1922,7 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
           const cards = [
             { label: 'Total Pemagang', val: stats.total_interns ?? 0, icon: 'fa-users', color: 'blue' },
             { label: 'Aktif', val: stats.active_interns ?? 0, icon: 'fa-user-check', color: 'green' },
-            { label: 'Tugas Pending', val: stats.pending_tasks ?? 0, icon: 'fa-clock', color: 'orange' },
+            { label: 'Tugas Tertunda', val: stats.pending_tasks ?? 0, icon: 'fa-clock', color: 'orange' },
             { label: 'Evaluasi Selesai', val: stats.total_evaluations ?? 0, icon: 'fa-clipboard-check', color: 'purple' }
           ];
           
@@ -2034,8 +2034,8 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
           const cards = [
             { label: 'Bimbingan Saya', val: stats.assigned_interns ?? 0, icon: 'fa-chalkboard-user', color: 'blue' },
             { label: 'Tugas Dibuat', val: stats.my_tasks ?? 0, icon: 'fa-list-check', color: 'cyan' },
-            { label: 'Perlu Approval', val: stats.pending_approvals ?? 0, icon: 'fa-hourglass-half', color: 'yellow' },
-            { label: 'Evaluasi Input', val: stats.completed_evaluations ?? 0, icon: 'fa-star', color: 'pink' }
+            { label: 'Perlu Persetujuan', val: stats.pending_approvals ?? 0, icon: 'fa-hourglass-half', color: 'yellow' },
+            { label: 'Evaluasi Selesai', val: stats.completed_evaluations ?? 0, icon: 'fa-star', color: 'pink' }
           ];
           container.innerHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 fade-in">
@@ -2159,7 +2159,7 @@ function renderJadwalSection(jadwalData, myJadwalIds) {
           container.innerHTML = `
             <div class="glass rounded-xl p-6 mb-6 fade-in border-l-4 border-brand-500">
               <h3 class="text-lg font-bold text-white mb-1">Hai ${state.user.full_name || 'Pemagang'}!</h3>
-              <p class="text-sm text-slate-300">Selamat kamu sudah dapat menggunakan semua fasilitas yang ada di aplikasi Pemagang, silahkan gunakan aplikasi ini dengan bijak ya.</p>
+              <p class="text-sm text-slate-300">Selamat, kamu sudah dapat menggunakan semua fasilitas yang ada di aplikasi Pemagang. Silakan gunakan aplikasi ini dengan bijak ya.</p>
             </div>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 fade-in">
